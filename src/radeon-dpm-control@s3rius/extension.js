@@ -85,7 +85,7 @@ DPMControl.prototype =
     },
 
     _updateIcon: function(){
-        [res,pid,fdin,fdout,fderr] = GLib.spawn_async_with_pipes(null, ["/usr/bin/dpm-query", "get", "all"], null, GLib.SpawnFlags.SEARCH_PATH, null);
+        [res,pid,fdin,fdout,fderr] = GLib.spawn_async_with_pipes(null, ["/usr/bin/dpm-query", "get", "default"], null, GLib.SpawnFlags.SEARCH_PATH, null);
         let outstream = new Gio.UnixInputStream({fd:fdout,close_fd:true});
         let stdout = new Gio.DataInputStream({base_stream: outstream});
 
@@ -143,7 +143,7 @@ DPMControl.prototype =
     _setDPM: function(a,b,setting)
     {
         let pkexec_path = GLib.find_program_in_path('pkexec');
-        let result = Util.trySpawnCommandLine(pkexec_path + " /usr/bin/dpm-query set all " + setting);
+        let result = Util.trySpawnCommandLine(pkexec_path + " /usr/bin/dpm-query set default " + setting);
     },
 
 };
