@@ -26,7 +26,8 @@ function enable()
 }
 function disable()
 {
-  Mainloop.source_remove(event);
+    dpmc.destroy();
+    Mainloop.source_remove(event);
 }
 
 function PopupIconMenuItem()
@@ -52,6 +53,10 @@ PopupIconMenuItem.prototype =
         this.box.add(this.label);
         
         this.actor.add(this.box);
+    },
+
+    _onDestroy: function(){
+        this.menu.removeAll();
     }
 };
 
@@ -93,7 +98,7 @@ DPMControl.prototype =
         else {
             let result = out.toString() + out2.toString();
             
-            if( result.search("low") != -1 && result.search("battery") != -1 ){ // out.toString()
+            if( result.search("low") != -1 && result.search("battery") != -1 ){
                 this._iconActor.icon_name = "radeon-control-green";
             } else if( result.search("auto") != -1 && result.search("balanced") != -1 ) {
                 this._iconActor.icon_name = "radeon-control-yellow";
