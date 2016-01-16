@@ -20,4 +20,4 @@ Enable the extension in your Tweak Tool.
 # Uninstallation
 Disable the extension.
 
-Run `sudo make uninstall`.
+Run `sudo make uninstall` in the same location.
