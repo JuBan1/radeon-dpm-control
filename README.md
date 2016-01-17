@@ -17,13 +17,32 @@ This extension makes use of Thomas Debesse's [`dpm-query`](https://github.com/il
 Installation
 ------------
 
-Download the files and cd into their directory (`git clone https://github.com/JuBan1/radeon-dpm-control.git` and `cd radeon-dpm-control`).
+Download the files and cd into their directory:
 
-Install via `sudo make install`.
+```sh
+git clone https://github.com/JuBan1/radeon-dpm-control.git
+cd radeon-dpm-control
+```
+
+Install in user path this way:
+
+```sh
+./configure
+make install
+```
+
+Install system-wide this way:
+
+```sh
+./configure --system-wide
+sudo make install
+```
 
 Update your GNOME shell by restarting or pressing Alt+F2 and typing `r`.
 
 Enable the extension in your Tweak Tool.
+
+You can also create a zip file doing `make zip`, you will find it in `build` directory.
 
 
 Uninstallation
@@ -31,4 +50,4 @@ Uninstallation
 
 Disable the extension.
 
-Run `sudo make uninstall` in the same location.
+Run `make uninstall` (or `sudo make uninstall`) in the same location.
