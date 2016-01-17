@@ -42,6 +42,8 @@ Update your GNOME shell by restarting or pressing Alt+F2 and typing `r`.
 
 Enable the extension in your Tweak Tool.
 
+You can also create a zip file doing `make zip`, you will find it in `build` directory.
+
 
 Uninstallation
 --------------

@@ -2,10 +2,12 @@
 
 tab="$(printf '\t')"
 
-extension_uuid='radeon-dpm-control@s3rius'
+extension_id='radeon-dpm-control'
+extension_uuid="${extension_id}@s3rius"
 system_path='/usr/share/gnome-shell/extensions'
 user_path="${HOME}/.local/share/gnome-shell/extensions"
 source_path="src"
+build_path="build"
 
 _help () {
 	cat <<-EOF
@@ -64,6 +66,15 @@ _list_uninstall_files () {
 	done
 }
 
+_list_zip_files () {
+	for file in $(_list_files)
+	do
+		cat <<-EOF
+		${tab}(cd ${source_path}; zip ../${build_path}/${extension_uuid}.zip ${file})
+		EOF
+	done
+}
+
 _write_makefile () {
 	if [ "${system_wide}" = 'true' ]
 	then
@@ -82,6 +93,16 @@ _write_makefile () {
 	uninstall:
 	$(_list_uninstall_files)
 	${tab}rmdir --parents --ignore-fail-on-non-empty ${install_path}/icons
+
+	zip:
+	${tab}mkdir --parents ${build_path}
+	${tab}zip ${build_path}/${extension_uuid}.zip README.md
+	$(_list_zip_files)
+
+	clean:
+	${tab}rm ${build_path}/${extension_uuid}.zip
+	${tab}rmdir ${build_path}
+	
 	EOF
 }
 
