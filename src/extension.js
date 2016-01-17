@@ -181,8 +181,9 @@ DPMControl.prototype =
                 GLib.spawn_close_pid(pid);
             }
             else {
-                //DO_NOT_REAP_CHILD has to be passed in order to not immediately kill the child process.
+                //DO_NOT_REAP_CHILD has to be passed in order to not immediately kill the child process before the user can authenticate himself.
                 //Then we have to watch for the child ourselves and kill the process once it becomes a zombie.
+                //More about this here: https://developer.gnome.org/glib/stable/glib-Spawning-Processes.html#g-spawn-async-with-pipes
                 [res, pid] = GLib.spawn_async_with_pipes(null, [pkexec_path, dpmquery_path, "set", "default"].concat(settings),
                                                          null, GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD, null);
 
