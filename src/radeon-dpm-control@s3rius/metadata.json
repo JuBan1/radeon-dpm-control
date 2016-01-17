@@ -1,1 +1,11 @@
-{"uuid": "radeon-dpm-control@s3rius", "shell-version": ["3.16", "3.18", "3.18.3"], "description": "A small extension to manually change Radeon's DPM settings.", "name": "Radeon DPM Control"}
+{
+  "name": "Radeon DPM Control",
+  "description": "A small extension to manually change Radeon's DPM settings.",
+  "uuid": "radeon-dpm-control@s3rius",
+  "extension-id": "radeon-dpm-control",
+  "url": "https://github.com/JuBan1/radeon-dpm-control",
+  "shell-version": [
+    "3.16",
+    "3.18"
+  ]
+}
