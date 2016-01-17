@@ -1,5 +1,12 @@
 /*
-    
+    Copyright (c) 2016 Julian Bansen
+
+    Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, 
+    provided that the above copyright notice and this permission notice appear in all copies.
+
+    The software is provided "as is" and the author disclaims all warranties with regard to this software including all implied warranties of merchantability and fitness. 
+    In no event shall the author be liable for any special, direct, indirect, or consequential damages or any damages whatsoever resulting from loss of use, data or profits, 
+    whether in an action of contract, negligence or other tortious action, arising out of or in connection with the use or performance of this software.
 */
 
 const GLib = imports.gi.GLib;
@@ -174,11 +181,20 @@ DPMControl.prototype =
                 GLib.spawn_close_pid(pid);
             }
             else {
+                //DO_NOT_REAP_CHILD has to be passed in order to not immediately kill the child process.
+                //Then we have to watch for the child ourselves and kill the process once it becomes a zombie.
                 [res, pid] = GLib.spawn_async_with_pipes(null, [pkexec_path, dpmquery_path, "set", "default"].concat(settings),
-                                                         null, GLib.SpawnFlags.SEARCH_PATH, null);
-                GLib.spawn_close_pid(pid);
+                                                         null, GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD, null);
+
+                //This function is documented here:
+                //https://people.gnome.org/~gcampagna/docs/GLib-2.0/GLib.child_watch_add.html
+                GLib.child_watch_add(GLib.PRIORITY_DEFAULT_IDLE, pid, waitpidCallback);
             }
         }
         GLib.spawn_close_pid(pid);
     },
 };
+
+function waitpidCallback(pid, status){
+    GLib.spawn_close_pid(pid);
+}
