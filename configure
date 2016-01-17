@@ -1,0 +1,90 @@
+#! /bin/sh
+
+tab="$(printf '\t')"
+
+extension_uuid='radeon-dpm-control@s3rius'
+system_path='/usr/share/gnome-shell/extensions'
+user_path="${HOME}/.local/share/gnome-shell/extensions"
+source_path="src"
+
+_help () {
+	cat <<-EOF
+	usage: ${0} [options]
+
+	options:
+	${tab}--system-wide (enable system wide installation)
+	${tab}-h, --help    (print this help)
+
+	EOF
+
+	exit 0
+}
+
+
+system_wide='false'
+for arg in ${@}
+do
+	case "${arg}" in
+		'--system-wide')
+			system_wide='true'
+		;;
+		'-h'|'--help')
+			_help
+		;;
+	esac
+done
+
+_list_files () {
+	cat <<-EOF
+	extension.js
+	metadata.json
+	icons/radeon-control-other.png
+	icons/radeon-control-red.png
+	icons/radeon-control-green.png
+	icons/radeon-control-error.png
+	icons/radeon-control-yellow.png
+	EOF
+}
+
+_list_install_files () {
+	for file in $(_list_files)
+	do
+		cat <<-EOF
+		${tab}cp ${source_path}/${file} ${install_path}/${file}
+		EOF
+	done
+}
+
+_list_uninstall_files () {
+	for file in $(_list_files)
+	do
+		cat <<-EOF
+		${tab}rm ${install_path}/${file}
+		EOF
+	done
+}
+
+_write_makefile () {
+	if [ "${system_wide}" = 'true' ]
+	then
+		install_path="${system_path}/${extension_uuid}"
+	else
+		install_path="${user_path}/${extension_uuid}"
+	fi
+
+	cat > Makefile <<-EOF
+	all:
+
+	install:
+	${tab}mkdir --parents ${install_path}/icons
+	$(_list_install_files)
+
+	uninstall:
+	$(_list_uninstall_files)
+	${tab}rmdir --parents --ignore-fail-on-non-empty ${install_path}/icons
+	EOF
+}
+
+_write_makefile
+
+#EOF

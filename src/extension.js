@@ -12,6 +12,7 @@ const Main = imports.ui.main;
 const PopupMenu = imports.ui.popupMenu;
 const PanelMenu = imports.ui.panelMenu;
 const Lang = imports.lang;
+const Me = imports.misc.extensionUtils.getCurrentExtension();
 
 function init()
 {
@@ -75,10 +76,17 @@ DPMControl.prototype =
     {
         PanelMenu.Button.prototype._init.call(this, 0);
 
-        this._iconActor = new St.Icon({ icon_name: "radeon-control-green",
-                                        style_class: "system-status-icon" });
+        this._icons = {
+            "battery": Me.path + "/icons/radeon-control-green.png",
+            "balanced": Me.path + "/icons/radeon-control-yellow.png",
+            "performance": Me.path + "/icons/radeon-control-red.png",
+            "error": Me.path + "/icons/radeon-control-error.png",
+            "other": Me.path + "/icons/radeon-control-other.png"
+        };
 
-        this.actor.add_actor(this._iconActor);
+        this.icon = new St.Icon({ gicon: Gio.icon_new_for_string(this._icons["battery"]), style_class: "system-status-icon" });
+
+        this.actor.add_actor(this.icon);
         this.actor.add_style_class_name("panel-status-button");
 
         this._display();
@@ -99,19 +107,19 @@ DPMControl.prototype =
         let [out2, size2] = stdout.read_line(null);
 
         if(out == null) {
-             this._iconActor.icon_name = "radeon-control-error";
+             this._iconActor.icon_name = this._icons["error"];
         }
         else {
             let result = out.toString() + out2.toString();
             
             if( result.search("\"low\"") != -1 && result.search("\"battery\"") != -1 ){
-                this._iconActor.icon_name = "radeon-control-green";
+                this.icon.gicon = Gio.icon_new_for_string(this._icons["battery"]);
             } else if( result.search("\"auto\"") != -1 && result.search("\"balanced\"") != -1 ) {
-                this._iconActor.icon_name = "radeon-control-yellow";
+                this.icon.gicon = Gio.icon_new_for_string(this._icons["balanced"]);
             } else if( result.search("\"high\"") != -1 && result.search("\"performance\"") != -1 ) {
-                this._iconActor.icon_name = "radeon-control-red";
+                this.icon.gicon = Gio.icon_new_for_string(this._icons["performance"]);
             } else{ 
-                this._iconActor.icon_name = "radeon-control-other";
+                this.icon.gicon = Gio.icon_new_for_string(this._icons["other"]);
             }
         }
     },
@@ -120,17 +128,17 @@ DPMControl.prototype =
    {
         this._updateIcon();
 
-        let gicon = Gio.content_type_get_icon("radeon-control-green");
+        let gicon = Gio.icon_new_for_string(this._icons["battery"]);
         let menuItem = new PopupIconMenuItem(gicon, " Set Low/Battery", {});
         this.menu.addMenuItem(menuItem);
         menuItem.connect("activate", Lang.bind(this, this._setDPM, ["low", "battery"]));
 
-        let gicon = Gio.content_type_get_icon("radeon-control-yellow");
+        let gicon = Gio.icon_new_for_string(this._icons["balanced"]);
         let menuItem = new PopupIconMenuItem(gicon, " Set Auto/Balanced", {});
         this.menu.addMenuItem(menuItem);
         menuItem.connect("activate", Lang.bind(this, this._setDPM, ["auto", "balanced"]));
 
-        let gicon = Gio.content_type_get_icon("radeon-control-red");
+        let gicon = Gio.icon_new_for_string(this._icons["performance"]);
         let menuItem = new PopupIconMenuItem(gicon, " Set High/Performance", {});
         this.menu.addMenuItem(menuItem);
         menuItem.connect("activate", Lang.bind(this, this._setDPM, ["high", "performance"]));
@@ -156,7 +164,7 @@ DPMControl.prototype =
         let [out, size] = stdout.read_line(null);
 
         if(out == null) {
-            this._iconActor.icon_name = "radeon-control-error";
+            this._iconActor.icon_name = this._icons["error"];
         }
         else {
             let result = out.toString();
