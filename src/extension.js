@@ -84,14 +84,14 @@ DPMControl.prototype =
         PanelMenu.Button.prototype._init.call(this, 0);
 
         this._icons = {
-            "battery": Me.path + "/icons/radeon-control-green.png",
-            "balanced": Me.path + "/icons/radeon-control-yellow.png",
-            "performance": Me.path + "/icons/radeon-control-red.png",
-            "error": Me.path + "/icons/radeon-control-error.png",
-            "other": Me.path + "/icons/radeon-control-other.png"
+            "battery": Gio.icon_new_for_string(Me.path + "/icons/radeon-control-green.png"),
+            "balanced": Gio.icon_new_for_string(Me.path + "/icons/radeon-control-yellow.png"),
+            "performance": Gio.icon_new_for_string(Me.path + "/icons/radeon-control-red.png"),
+            "error": Gio.icon_new_for_string(Me.path + "/icons/radeon-control-error.png"),
+            "other": Gio.icon_new_for_string(Me.path + "/icons/radeon-control-other.png")
         };
 
-        this.icon = new St.Icon({ gicon: Gio.icon_new_for_string(this._icons["battery"]), style_class: "system-status-icon" });
+        this.icon = new St.Icon({ gicon: this._icons["battery"], style_class: "system-status-icon" });
 
         this.actor.add_actor(this.icon);
         this.actor.add_style_class_name("panel-status-button");
@@ -120,13 +120,13 @@ DPMControl.prototype =
             let result = out.toString() + out2.toString();
             
             if( result.search("\"low\"") != -1 && result.search("\"battery\"") != -1 ){
-                this.icon.gicon = Gio.icon_new_for_string(this._icons["battery"]);
+                this.icon.gicon = this._icons["battery"];
             } else if( result.search("\"auto\"") != -1 && result.search("\"balanced\"") != -1 ) {
-                this.icon.gicon = Gio.icon_new_for_string(this._icons["balanced"]);
+                this.icon.gicon = this._icons["balanced"];
             } else if( result.search("\"high\"") != -1 && result.search("\"performance\"") != -1 ) {
-                this.icon.gicon = Gio.icon_new_for_string(this._icons["performance"]);
+                this.icon.gicon = this._icons["performance"];
             } else{ 
-                this.icon.gicon = Gio.icon_new_for_string(this._icons["other"]);
+                this.icon.gicon = this._icons["other"];
             }
         }
     },
@@ -135,17 +135,17 @@ DPMControl.prototype =
    {
         this._updateIcon();
 
-        let gicon = Gio.icon_new_for_string(this._icons["battery"]);
+        let gicon = this._icons["battery"];
         let menuItem = new PopupIconMenuItem(gicon, " Set Low/Battery", {});
         this.menu.addMenuItem(menuItem);
         menuItem.connect("activate", Lang.bind(this, this._setDPM, ["low", "battery"]));
 
-        let gicon = Gio.icon_new_for_string(this._icons["balanced"]);
+        let gicon = this._icons["balanced"];
         let menuItem = new PopupIconMenuItem(gicon, " Set Auto/Balanced", {});
         this.menu.addMenuItem(menuItem);
         menuItem.connect("activate", Lang.bind(this, this._setDPM, ["auto", "balanced"]));
 
-        let gicon = Gio.icon_new_for_string(this._icons["performance"]);
+        let gicon = this._icons["performance"];
         let menuItem = new PopupIconMenuItem(gicon, " Set High/Performance", {});
         this.menu.addMenuItem(menuItem);
         menuItem.connect("activate", Lang.bind(this, this._setDPM, ["high", "performance"]));
