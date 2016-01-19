@@ -19,24 +19,92 @@ const Main = imports.ui.main;
 const PopupMenu = imports.ui.popupMenu;
 const PanelMenu = imports.ui.panelMenu;
 const Lang = imports.lang;
+const Shell = imports.gi.Shell;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
+
+
+/*
+	Monitors only the first available AMD card, but can monitor a second one with almost no changes.
+	But that makes little sense since we only show a single icon anyways.
+*/
+
+var cards = [
+	{
+		num: 0,
+		valid: false,
+		power_method: "/sys/class/drm/card0/device/power_method",
+		perf_level: "/sys/class/drm/card0/device/power_dpm_force_performance_level",
+		state: "/sys/class/drm/card0/device/power_dpm_state"
+	}, 
+
+	{
+		num: 1,
+		valid: false,
+		power_method: "/sys/class/drm/card1/device/power_method",
+		perf_level: "/sys/class/drm/card1/device/power_dpm_force_performance_level",
+		state: "/sys/class/drm/card1/device/power_dpm_state"
+	}, 
+]
+
+function init_card(card){
+
+	//Before activating files monitors we need to check all necessary files for their existence. 
+	//Also monitor whether power_method is actually set to "dpm". If it isn't, this extension is useless.
+	if( GLib.file_test(card.power_method, GLib.FileTest.EXISTS) &&
+		Shell.get_file_contents_utf8_sync(card.power_method).trim()=="dpm" &&
+		GLib.file_test(card.perf_level, GLib.FileTest.EXISTS) && 
+		GLib.file_test(card.state, GLib.FileTest.EXISTS)) {
+			card.valid = true;
+	}
+
+}
+
+function init_cards(){
+	init_card(cards[0]);
+}
+
+function enable_monitoring(card, updateFunc){
+	if(!card.valid)
+		return;
+
+	let perf_file_obj = Gio.file_new_for_path(card.perf_level);
+	let state_file_obj = Gio.file_new_for_path(card.state);
+
+	card.perf_monitor = perf_file_obj.monitor(Gio.FileMonitorFlags.NONE, null);
+	card.state_monitor = state_file_obj.monitor(Gio.FileMonitorFlags.NONE, null);
+
+	card.perf_monitor.connect('changed', updateFunc);
+	card.state_monitor.connect('changed', updateFunc);
+}
+
+function disable_monitoring(card){
+	if(!card.valid)
+		return;
+
+	card.perf_monitor.cancel();
+	card.state_monitor.cancel();
+}
+
 
 function init()
 {
+	init_cards();
 }
 
 let dpmc;
-let event=null;
 
 function enable()
 {
-  dpmc = new DPMControl();
+ 	dpmc = new DPMControl();	
+
+ 	enable_monitoring(cards[0], Lang.bind(dpmc, dpmc._updateIcon) );
 }
 
 function disable()
 {
     dpmc.destroy();
-    Mainloop.source_remove(event);
+
+    disable_monitoring(cards[0]);
 }
 
 function PopupIconMenuItem()
@@ -149,11 +217,6 @@ DPMControl.prototype =
         let menuItem = new PopupIconMenuItem(gicon, " Set High/Performance", {});
         this.menu.addMenuItem(menuItem);
         menuItem.connect("activate", Lang.bind(this, this._setDPM, ["high", "performance"]));
-
-        event = GLib.timeout_add_seconds(0, 5, Lang.bind(this, function () {
-            this._updateIcon();
-            return true;
-        }));
     },
 
     // This code was taken and modified from:
