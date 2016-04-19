@@ -6,6 +6,7 @@
   "url": "https://github.com/JuBan1/radeon-dpm-control",
   "shell-version": [
     "3.16",
-    "3.18"
+    "3.18",
+    "3.20"
   ]
 }
