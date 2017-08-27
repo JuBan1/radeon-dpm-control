@@ -208,13 +208,13 @@ DPMControl.prototype =
         this.menu.addMenuItem(menuItem);
         menuItem.connect("activate", Lang.bind(this, this._setDPM, ["low", "battery"]));
 
-        let gicon = this._icons["balanced"];
-        let menuItem = new PopupIconMenuItem(gicon, " Set Auto/Balanced", {});
+        gicon = this._icons["balanced"];
+        menuItem = new PopupIconMenuItem(gicon, " Set Auto/Balanced", {});
         this.menu.addMenuItem(menuItem);
         menuItem.connect("activate", Lang.bind(this, this._setDPM, ["auto", "balanced"]));
 
-        let gicon = this._icons["performance"];
-        let menuItem = new PopupIconMenuItem(gicon, " Set High/Performance", {});
+        gicon = this._icons["performance"];
+        menuItem = new PopupIconMenuItem(gicon, " Set High/Performance", {});
         this.menu.addMenuItem(menuItem);
         menuItem.connect("activate", Lang.bind(this, this._setDPM, ["high", "performance"]));
     },
